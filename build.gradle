@@ -1,46 +1,30 @@
-plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.0'
-	id 'io.spring.dependency-management' version '1.1.4'
-}
-
 group = 'com.campmeme.website'
 version = '1.0'
 
-java {
-	sourceCompatibility = '17'
-	targetCompatibility = '17'
-}
+subprojects {
+	apply plugin: 'java'
 
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	implementation 'org.springframework.boot:spring-boot-starter-jersey'
-	//implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-// -------------------- ARCHIVE GENERATION --------------------
-
-jar {
-	manifest {
-		attributes 'Built-By': 'Steven HENRY'
+	repositories {
+		mavenCentral()
 	}
-}
 
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-}
+	// -------------------- ARCHIVE GENERATION --------------------
+	java {
+		sourceCompatibility = '17'
+		targetCompatibility = '17'
+	}
 
-javadoc {
-	source = sourceSets.main.allJava
+	jar {
+		manifest {
+			attributes 'Built-By': 'Steven HENRY'
+		}
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		options.encoding = 'UTF-8'
+	}
+
+	javadoc {
+		source = sourceSets.main.allJava
+	}
 }

@@ -1,1 +1,4 @@
 rootProject.name = 'CampMeme-API'
+include 'entities'
+include 'api'
+
