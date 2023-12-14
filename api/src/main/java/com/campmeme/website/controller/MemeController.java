@@ -1,16 +1,17 @@
 package com.campmeme.website.controller;
 
-import com.campmeme.website.repository.MemeRepository;
 import com.campmeme.website.entity.Meme;
+import com.campmeme.website.request.MemeCreationResponse;
+import com.campmeme.website.request.MemePostRequest;
+import com.campmeme.website.request.OperationFailed;
+import com.campmeme.website.service.MemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
@@ -19,36 +20,51 @@ public class MemeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MemeController.class);
 
-    MemeRepository memeRepository;
+    private final MemeService service;
 
     @Autowired
-    public MemeController(MemeRepository memeRepository) {
-        this.memeRepository = memeRepository;
+    public MemeController(MemeService memeService) {
+        this.service = memeService;
     }
 
     @GetMapping("/{id}")
-    public Meme getPersonById(@PathVariable long id) {
-        return memeRepository.findById(id).orElse(null);
-    }
-
-    @GetMapping
-    public List<Meme> getAll() {
-        return memeRepository.findAll();
-    }
-
-    @PostMapping()
-    public ResponseEntity<String> test(){
-        return ResponseEntity.ok("suh");
+    public ResponseEntity<?> getPersonById(@PathVariable long id) {
+        Optional<Meme> meme = service.getMemeInfo(id);
+        if(meme.isEmpty()){
+            return ResponseEntity.ok(new OperationFailed("Identifiant de meme \"%d\" inconnu.".formatted(id)));
+        }
+        return ResponseEntity.ok(meme.get());
     }
 
 
     @PostMapping("/post")
-    public ResponseEntity<?> createPerson(@RequestBody Meme meme) {
-        LOGGER.debug("MEME POSTED!");
+    public ResponseEntity<?> createMeme(@RequestBody MemePostRequest postRequest) {
+        Optional<OperationFailed> optFailed = service.checkRequest(postRequest);
+        if(optFailed.isPresent()){
+            return ResponseEntity.ok(optFailed.get());
+        }
+        if (service.checkFilePathExistence(postRequest.file_path())) {
+            return ResponseEntity.ok(new OperationFailed("Le meme existe déjà sous l'identifiant %d"
+                    .formatted(service.getMemeId(postRequest.file_path()))));
+        }
+        if(!service.hasHTTPPrefix(postRequest.file_path())){
+            return ResponseEntity.ok(new OperationFailed("L'URL doit être de protocole HTTP ou HTTPS!"));
+        }
+        if(!service.hasExtension(postRequest.file_path(), "jpg", "jpeg", "png", "gif", "svg", "webp", "apng")){
+            return ResponseEntity.ok(new OperationFailed("L'URL doit mener vers un fichier jpg / " +
+                    "jpeg / png / gif / svp / webp / apng !"));
+        }
+        Meme meme = service.createMeme(postRequest);
+        return ResponseEntity.ok(new MemeCreationResponse(meme.getId()));
+    }
 
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("acceptance", true);
-        return ResponseEntity.ok(response);
-        //return memeRepository.save(meme);
+    @PostMapping("/query")
+    public void query(){
+
+    }
+
+    @GetMapping("/trend")
+    public ResponseEntity<?> trends(){
+        return ResponseEntity.ok(service.getTrendMemes());
     }
 }

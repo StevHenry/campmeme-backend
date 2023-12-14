@@ -2,6 +2,7 @@ package com.campmeme.website.entity;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -10,19 +11,22 @@ public class User {
 
     @Id
     private ObjectId id;
+
     private String username;
 
     private String password;
-    private String salt;
 
     @Field(name = "group")
     private int groupId;
 
-    public User(ObjectId id, String username, String salt, int groupId) {
-        this.id = id;
+    @Indexed(unique = true)
+    private String email;
+
+    public User(String username, String password, int groupId, String email) {
         this.username = username;
-        this.salt = salt;
         this.groupId = groupId;
+        this.password = password;
+        this.email = email;
     }
 
     public ObjectId getId() {
@@ -41,14 +45,6 @@ public class User {
         this.username = username;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -63,5 +59,13 @@ public class User {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

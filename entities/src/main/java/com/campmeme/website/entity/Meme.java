@@ -1,6 +1,7 @@
 package com.campmeme.website.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -11,6 +12,9 @@ import java.util.List;
 @Document(collection = "memes")
 public class Meme {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "memes_sequence";
+
     @Id
     private long id;
 
@@ -18,17 +22,21 @@ public class Meme {
     private List<String> tags;
 
     @Field(name="file_path")
+    @Indexed
     private String filePath;
 
     @Field(name="like_count")
     private int likeCount;
 
-    public Meme(long id, List<String> tags, String filePath, int likeCount) {
+    @Field(name="contributor")
+    private String contributorId;
+
+    public Meme(String filePath, List<String> tags, int likeCount, String contributorId) {
         super();
-        this.id = id;
         this.tags = tags;
         this.filePath = filePath;
         this.likeCount = likeCount;
+        this.contributorId = contributorId;
     }
 
     public long getId() {
@@ -61,5 +69,13 @@ public class Meme {
 
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public String getContributorId() {
+        return contributorId;
+    }
+
+    public void setContributorId(String contributorId) {
+        this.contributorId = contributorId;
     }
 }
