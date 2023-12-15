@@ -18,12 +18,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean emailExists(String email){
+    public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
@@ -35,11 +35,11 @@ public class AuthService {
         return user;
     }
 
-    public Optional<UserLoginResponse> attemptLogin(UserLoginRequest credentials){
+    public Optional<UserLoginResponse> attemptLogin(UserLoginRequest credentials) {
         Optional<User> userOpt = userRepository.findByEmail(credentials.getEmail());
-        if(userOpt.isPresent()){
+        if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if(passwordEncoder.matches(credentials.getPassword(), user.getPassword())){
+            if (passwordEncoder.matches(credentials.getPassword(), user.getPassword())) {
                 return Optional.of(new UserLoginResponse(user.getUsername(),
                         user.getGroupId(), user.getId().toHexString()));
             }

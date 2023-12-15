@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+
 @Configuration
 public class MongoConfig {
 
@@ -17,6 +18,7 @@ public class MongoConfig {
 
     @Autowired
     MongoMappingContext mongoMappingContext;
+
     @Bean
     public MappingMongoConverter mappingMongoConverter() {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory);

@@ -6,8 +6,6 @@ import com.campmeme.website.request.MemePostRequest;
 import com.campmeme.website.request.OperationFailed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -78,18 +76,19 @@ public class MemeService {
         return string == null || string.isEmpty() || string.isBlank();
     }
 
-    public boolean hasHTTPPrefix(String filePath){
+    public boolean hasHTTPPrefix(String filePath) {
         return filePath.startsWith("http://") || filePath.startsWith("https://");
     }
-    public boolean hasExtension(String filePath, String... extensions){
-        for(String str : extensions){
-            if(filePath.endsWith('.' + str))
+
+    public boolean hasExtension(String filePath, String... extensions) {
+        for (String str : extensions) {
+            if (filePath.endsWith('.' + str))
                 return true;
         }
         return false;
     }
 
-    public List<Meme> getTrendMemes(){
+    public List<Meme> getTrendMemes() {
         return memeRepository.findByOrderByLikeCountDesc(Limit.of(15));
     }
 
@@ -113,7 +112,7 @@ public class MemeService {
         return randomIndices;
     }
 
-    public List<Meme> findByTags(List<String> tags){
+    public List<Meme> findByTags(List<String> tags) {
         return tags.stream().map(memeRepository::findByTagsContainingIgnoreCase).flatMap(List::stream)
                 .collect(Collectors.toList());
     }

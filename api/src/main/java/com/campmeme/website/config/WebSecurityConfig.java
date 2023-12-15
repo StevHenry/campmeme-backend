@@ -10,8 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
-
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -21,9 +19,9 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authz) -> authz.anyRequest().permitAll())
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(config -> config.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
-            .httpBasic(withDefaults());
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(config -> config.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
+                .httpBasic(withDefaults());
         return http.build();
     }
 

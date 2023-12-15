@@ -12,12 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 
 @RestController
@@ -36,7 +33,7 @@ public class MemeController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getPersonById(@PathVariable long id) {
         Optional<Meme> meme = service.getMemeInfo(id);
-        if(meme.isEmpty()){
+        if (meme.isEmpty()) {
             return ResponseEntity.ok(new OperationFailed("Identifiant de meme \"%d\" inconnu.".formatted(id)));
         }
         return ResponseEntity.ok(meme.get());
@@ -46,17 +43,17 @@ public class MemeController {
     @PostMapping("/post")
     public ResponseEntity<?> createMeme(@RequestBody MemePostRequest postRequest) {
         Optional<OperationFailed> optFailed = service.checkRequest(postRequest);
-        if(optFailed.isPresent()){
+        if (optFailed.isPresent()) {
             return ResponseEntity.ok(optFailed.get());
         }
         if (service.checkFilePathExistence(postRequest.file_path())) {
             return ResponseEntity.ok(new OperationFailed("Le meme existe déjà sous l'identifiant %d"
                     .formatted(service.getMemeId(postRequest.file_path()))));
         }
-        if(!service.hasHTTPPrefix(postRequest.file_path())){
+        if (!service.hasHTTPPrefix(postRequest.file_path())) {
             return ResponseEntity.ok(new OperationFailed("L'URL doit être de protocole HTTP ou HTTPS!"));
         }
-        if(!service.hasExtension(postRequest.file_path(), "jpg", "jpeg", "png", "gif", "svg", "webp", "apng")){
+        if (!service.hasExtension(postRequest.file_path(), "jpg", "jpeg", "png", "gif", "svg", "webp", "apng")) {
             return ResponseEntity.ok(new OperationFailed("L'URL doit mener vers un fichier jpg / " +
                     "jpeg / png / gif / svp / webp / apng !"));
         }
@@ -65,18 +62,18 @@ public class MemeController {
     }
 
     @PostMapping("/query")
-    public List<Meme> query(@RequestBody QueryRequest query){
+    public List<Meme> query(@RequestBody QueryRequest query) {
         List<String> tags = List.of(query.query().toLowerCase(Locale.ROOT).split(" "));
         return service.findByTags(tags);
     }
 
     @GetMapping("/trend")
-    public ResponseEntity<?> trends(){
+    public ResponseEntity<?> trends() {
         return ResponseEntity.ok(service.getTrendMemes());
     }
 
     @GetMapping("/random")
-    public ResponseEntity<?> random(@RequestParam int quantity){
+    public ResponseEntity<?> random(@RequestParam int quantity) {
         return ResponseEntity.ok(service.getRandomDocuments(quantity));
     }
 }
