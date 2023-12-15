@@ -6,14 +6,17 @@ import com.campmeme.website.request.MemePostRequest;
 import com.campmeme.website.request.OperationFailed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MemeService {
+
+    private static final Random RANDOM = new Random();
 
     private final MemeRepository memeRepository;
     private final UserService userService;
@@ -88,5 +91,30 @@ public class MemeService {
 
     public List<Meme> getTrendMemes(){
         return memeRepository.findByOrderByLikeCountDesc(Limit.of(15));
+    }
+
+    public List<Meme> getRandomDocuments(int quantity) {
+        List<Long> randomIndices = generateRandomIndices(memeRepository.count(), quantity);
+        List<Meme> randomDocuments = new ArrayList<>();
+        randomIndices.stream().map(memeRepository::findById).forEach(memeOpt -> memeOpt.ifPresent(randomDocuments::add));
+        return randomDocuments;
+    }
+
+    private List<Long> generateRandomIndices(long totalCount, int quantity) {
+        List<Long> randomIndices = new ArrayList<>();
+        long realQuantity = Math.min(quantity, totalCount);
+
+        while (randomIndices.size() < realQuantity) {
+            long randomIndex = RANDOM.nextLong(totalCount);
+            if (!randomIndices.contains(randomIndex)) {
+                randomIndices.add(randomIndex);
+            }
+        }
+        return randomIndices;
+    }
+
+    public List<Meme> findByTags(List<String> tags){
+        return tags.stream().map(memeRepository::findByTagsContainingIgnoreCase).flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 }

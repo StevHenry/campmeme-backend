@@ -4,6 +4,7 @@ import com.campmeme.website.entity.Meme;
 import com.campmeme.website.request.MemeCreationResponse;
 import com.campmeme.website.request.MemePostRequest;
 import com.campmeme.website.request.OperationFailed;
+import com.campmeme.website.request.QueryRequest;
 import com.campmeme.website.service.MemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 
 @RestController
@@ -59,12 +65,18 @@ public class MemeController {
     }
 
     @PostMapping("/query")
-    public void query(){
-
+    public List<Meme> query(@RequestBody QueryRequest query){
+        List<String> tags = List.of(query.query().toLowerCase(Locale.ROOT).split(" "));
+        return service.findByTags(tags);
     }
 
     @GetMapping("/trend")
     public ResponseEntity<?> trends(){
         return ResponseEntity.ok(service.getTrendMemes());
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<?> random(@RequestParam int quantity){
+        return ResponseEntity.ok(service.getRandomDocuments(quantity));
     }
 }
