@@ -57,13 +57,7 @@ public class MemeService {
         if (postRequest.tags() == null || postRequest.tags().isEmpty()) {
             return Optional.of(new OperationFailed("Le champs \"tags\" ne peut pas être vide!"));
         } else {
-            Iterator<String> tags = postRequest.tags().iterator();
-            while (tags.hasNext()) {
-                String tag = tags.next();
-                if (isStringEmpty(tag)) {
-                    tags.remove();
-                }
-            }
+            postRequest.tags().removeIf(this::isStringEmpty);
             if (postRequest.tags().isEmpty()) {
                 return Optional.of(new OperationFailed("Le champs \"tags\" ne peut " +
                         "pas contenir uniquement des champs vides!"));
